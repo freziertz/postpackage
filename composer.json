@@ -1,0 +1,20 @@
+{
+  "name": "freziertz/postpackage",
+  "description": "A post package",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Frezier Ngonyani",
+      "email": "freziern@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Freziertz\\PostPackage\\": "src"
+    }
+  },
+  "require-dev": {
+    "orchestra/testbench": "^8.0"
+  }
+}
