@@ -1,5 +1,6 @@
 {
   "name": "freziertz/postpackage",
+  "version": "1.0.0",
   "description": "A post package",
   "type": "library",
   "license": "MIT",
@@ -11,10 +12,39 @@
   ],
   "autoload": {
     "psr-4": {
-      "Freziertz\\PostPackage\\": "src"
+      "Freziertz\\PostPackage\\": "src",
+      "Database\\Factories\\": "database/factories/",
+      "Database\\Seeders\\": "database/seeders/"
     }
   },
+
+  "autoload-dev": {
+      "psr-4": {
+          "Freziertz\\PostPackage\\Tests\\": "tests"
+      }
+  },
+
+  "scripts": {
+    "test": "vendor\\bin\\phpunit",
+    "test-f": "vendor\\bin\\phpunit --filter"
+  },
+
+  "extra": {
+      "laravel": {
+          "providers": [
+              "Freziertz\\PostPackage\\PostServiceProvider"
+          ],
+
+          "aliases": {
+            "Calculator": "Freziertz\\PostPackage\\Facades\\Calculator"
+        }
+           
+      }
+  },
+
+
   "require-dev": {
-    "orchestra/testbench": "^8.0"
+    "orchestra/testbench": "^8.0",
+    "phpunit/phpunit": "^10.0"
   }
 }
