@@ -13,3 +13,31 @@ The migrations of this package are now publishable under the "migrations" tag vi
 php artisan vendor:publish --provider="Freziertz\PostPackage\PostServiceProvider" --tag="migrations"
 
 ```
+
+The view can be exported by user of our package as follows.
+
+```cmd
+
+php artisan vendor:publish --provider="Freziertz\PostPackage\PostServiceProvider" --tag="views"
+
+```
+
+
+The assets can then be exported by users of our package using:
+
+```cmd
+
+php artisan vendor:publish --provider="Freziertz\PostPackage\PostServiceProvider" --tag="assets"
+
+```
+
+We can reference the stylesheet and javascript file in our views as follows:
+
+
+
+```cmd
+
+<script src="{{ asset('blogpackage/js/app.js') }}"></script>
+<link href="{{ asset('blogpackage/css/app.css') }}" rel="stylesheet" />
+
+```

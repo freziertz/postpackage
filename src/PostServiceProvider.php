@@ -3,7 +3,10 @@
 namespace Freziertz\PostPackage;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Route;
 use Freziertz\PostPackage\Console\InstallPostPackage;
+
+
 
 class PostServiceProvider extends ServiceProvider 
 {
@@ -28,12 +31,27 @@ class PostServiceProvider extends ServiceProvider
     public function boot() 
     {
 
+
+      $this->registerRoutes();
+
       
       if ($this->app->runningInConsole()) {
 
         $this->publishes([
+          __DIR__.'/../resources/views' => resource_path('views/vendor/postpackage'),
+        ], 'views');
+
+
+        $this->publishes([
           __DIR__.'/../config/config.php' =>   config_path('postpackage.php'),
         ], 'config');
+
+
+
+          // Publish assets
+        $this->publishes([
+          __DIR__.'/../resources/assets' => public_path('postpackage'),
+        ], 'assets');
 
 
         $this->commands([
@@ -49,6 +67,38 @@ class PostServiceProvider extends ServiceProvider
         }
 
       }
+
+
+
+      $this->loadViewsFrom(__DIR__.'/../resources/views', 'postpackage');
+
+
+
+      // $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+
+
+
+
+
+    
+
+
+    }
+
+
+    protected function registerRoutes()
+    {
+        Route::group($this->routeConfiguration(), function () {
+            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        });
+    }
+
+    protected function routeConfiguration()
+    {
+        return [
+            'prefix' => config('postpackage.prefix'),
+            'middleware' => config('postpackage.middleware'),
+        ];
     }
 
   
