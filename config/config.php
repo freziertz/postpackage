@@ -5,6 +5,10 @@ return [
   // other options...
 
   'prefix' => 'brainypost',
-  'middleware' => ['web'], // you probably want to include 'web' here
+  'middleware' => ['web'], 
+
+  'notifications' => [
+
+                   'channels' => 'mail']// you probably want to include 'web' here
 
 ];

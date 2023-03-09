@@ -5,8 +5,12 @@ namespace Freziertz\PostPackage\Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Freziertz\PostPackage\Models\Post;
 use Freziertz\PostPackage\Tests\TestCase;
+use Illuminate\Support\Facades\Event;
+use Freziertz\PostPackage\Events\PostWasCreated;
+use Freziertz\PostPackage\Listeners\UpdatePostTitle;
 use Freziertz\PostPackage\Tests\User;
 use Illuminate\Support\Str;
+use Freziertz\PostPackage\Http\Middleware\CapitalizeTitle;
 
 class CreatePostTest extends TestCase
 {
@@ -20,6 +24,10 @@ class CreatePostTest extends TestCase
 
         $this->withoutExceptionHandling();
         // To make sure we don't start with a Post
+
+        Event::fake();
+
+    
         $this->assertCount(0, Post::all());
 
         $author = User::factory()->create();
@@ -123,5 +131,75 @@ class CreatePostTest extends TestCase
         $this->get(route('posts.show', $post))
             ->assertSee('The single post title');
             // ->assertSee('The single post content');
+    }
+
+
+      /** @test */
+      function an_event_is_emitted_when_a_new_post_is_created()
+      {
+          Event::fake();
+
+          $author = User::factory()->create();
+
+          $this->actingAs($author)->post(route('posts.store'), [
+            'title' => 'A valid title',
+            'content' => 'A valid content',
+          ]);
+
+          $post = Post::first();
+
+          Event::assertDispatched(PostWasCreated::class, function ($event) use ($post) {
+              return $event->post->id === $post->id;
+          });
+      }
+
+
+          /** @test */
+    function a_newly_created_posts_title_will_be_changed()
+    {
+        $post = Post::factory()->create([
+            'title' => 'Initial title',
+        ]);
+
+        $this->assertEquals('Initial title', $post->title);
+
+        (new UpdatePostTitle())->handle(
+            new PostWasCreated($post)
+        );
+
+        $this->assertEquals('New: ' . 'Initial title', $post->fresh()->title);
+    }
+
+
+        /** @test */
+    function the_title_of_a_post_is_updated_whenever_a_post_is_created()
+    {
+         $author = User::factory()->create();
+
+        $this->actingAs($author)->post(route('posts.store'), [
+            'title' => 'A valid title',
+            'content' => 'A valid content',
+        ]);
+
+        $post = Post::first();
+
+       $this->assertEquals('New: ' . 'A valid title', $post->title);
+    }
+
+
+        /** @test */
+    function creating_a_post_will_capitalize_the_title()
+    {
+        $author = User::factory()->create();
+
+        $this->actingAs($author)->post(route('posts.store'), [
+            'title' => 'some title that was not capitalized',
+            'content' => 'A valid content',
+        ]);
+
+        $post = Post::first();
+
+        // 'New: ' was added by our event listener
+        $this->assertEquals('New: Some title that was not capitalized', $post->title);
     }
 }

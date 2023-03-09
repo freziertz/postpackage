@@ -5,6 +5,10 @@ namespace Freziertz\PostPackage;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Freziertz\PostPackage\Console\InstallPostPackage;
+use Freziertz\PostPackage\Providers\EventServiceProvider;
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Routing\Router;
+use Freziertz\PostPackage\Http\Middleware\CapitalizeTitle;
 
 
 
@@ -19,6 +23,8 @@ class PostServiceProvider extends ServiceProvider
 
       $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'postpackage');
 
+      $this->app->register(EventServiceProvider::class);
+
 
       $this->app->bind('calculator', function($app) {
           return new Calculator();
@@ -28,11 +34,14 @@ class PostServiceProvider extends ServiceProvider
 
 
 
-    public function boot() 
+    public function boot(Kernel $kernel) 
     {
 
 
       $this->registerRoutes();
+
+
+
 
       
       if ($this->app->runningInConsole()) {
@@ -75,6 +84,11 @@ class PostServiceProvider extends ServiceProvider
 
 
       // $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+
+      $kernel->pushMiddleware(CapitalizeTitle::class);
+
+      $router = $this->app->make(Router::class);
+      $router->aliasMiddleware('capitalize', CapitalizeTitle::class);
 
 
 

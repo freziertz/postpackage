@@ -7,6 +7,7 @@ use Freziertz\PostPackage\Models\Post;
 use Freziertz\PostPackage\Publishing\Enums\PostStatus;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
+use Freziertz\PostPackage\Events\PostWasCreated;
 
 
 class PostController extends Controller
@@ -52,6 +53,9 @@ class PostController extends Controller
             'status'      => $status->value,
             'published_at' => $status === PostStatus::PUBLISHED ? now() : null,
         ]);
+
+
+        event(new PostWasCreated($post));
 
         return redirect(route('posts.show', $post));
     }
